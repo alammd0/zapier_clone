@@ -28,7 +28,7 @@ async function main() {
             };
         }),
     })
-
+ 
     await prisma.zapRunOutBox.deleteMany({
         where: {
             id: {
