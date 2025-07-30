@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@theme {
+    --bg-cyan-100: #FBFAF8;
+}
