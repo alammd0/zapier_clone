@@ -73,12 +73,11 @@ router.post("/signup", async  (req, res) => {
 
 router.post("/login", async (req, res) => {
     try{
-        const body= req.body;
+        const body = req.body;
         const parsedUser = LoginSchema.safeParse(body);
 
-
         let response = null;
-
+        
         if(!parsedUser.success){
             res.status(411).json({
                 message: "Invalid Data",

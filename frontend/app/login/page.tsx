@@ -2,7 +2,7 @@ import AppBar from "@/components/AppBar";
 import AuthForm from "@/components/signupCompnents/AuthForm";
 import LoginCard from "@/components/signupCompnents/LoginCard";
 
-export default function Login() {
+export default function LoginPage() {
   return (
     <div>
       <AppBar />

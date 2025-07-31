@@ -1,8 +1,13 @@
 "use client";
 
+import { Login, SignUp } from "@/lib/api/auth";
 import { HtmlHTMLAttributes, useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function AuthForm({ type }: { type: string }) {
+
+  const router = useRouter();
   const [userData, setUserData] = useState({
     name: "",
     email: "",
@@ -17,6 +22,34 @@ export default function AuthForm({ type }: { type: string }) {
     }));
   }
 
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+      if (type === "signup") {
+        const response = await SignUp(userData);
+        console.log(response);
+        if(!response.data){
+          toast.error(response.message)
+        }
+
+        toast.success(response.message)
+        router.push("/login");
+      }
+      else{
+        const { email, password } = userData;
+
+        const response = await Login({ email, password });
+        console.log("response inside login", response);
+
+        if(!response.data){
+          toast.error(response.message)
+        }
+
+        localStorage.setItem("token", response.data.token);
+        toast.success(response.message)
+        router.push("/dashboard");
+      }
+  }
+
   return (
     <div className="w-full">
       <div className="flex flex-col gap-4">
@@ -27,7 +60,7 @@ export default function AuthForm({ type }: { type: string }) {
         </h1>
 
         <div className="border-2 border-gray-200 rounded-lg p-6">
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {type === "signup" && (
               <div className="flex flex-col gap-2">
                 <label className="text-sm" htmlFor="name">

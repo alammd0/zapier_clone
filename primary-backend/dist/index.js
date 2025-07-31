@@ -13,6 +13,6 @@ app.use((0, cors_1.default)());
 console.log("Check pass - 00");
 app.use("/api/v1/user", user_1.userRouter);
 app.use("/api/v1/zap", zap_1.zapRouter);
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
+app.listen(4000, () => {
+    console.log("Server is running on port 4000");
 });
