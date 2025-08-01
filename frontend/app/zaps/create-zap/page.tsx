@@ -3,8 +3,6 @@ import ZapDrawSection from "@/components/DrawCell/ZapDrawSection";
 
 
 export default function CreateZapPage(){
-
-
     
     return (
         <div>

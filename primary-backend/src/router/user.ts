@@ -6,13 +6,6 @@ import prisma from "../db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    password: string;
-}
-
 const router = Router();
 
 router.post("/signup", async  (req, res) => {
