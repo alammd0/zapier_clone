@@ -1,9 +1,17 @@
+import AppBar from "@/components/AppBar";
+import ZapDrawSection from "@/components/DrawCell/ZapDrawSection";
 
 
 export default function CreateZapPage(){
+
+
+    
     return (
         <div>
-            <h1>Create Zap</h1>
+            <AppBar />
+            <div className="min-h-screen bg-[#F9F7F3]">
+                <ZapDrawSection />
+            </div>
         </div>
     )
 }
