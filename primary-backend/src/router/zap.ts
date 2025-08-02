@@ -52,10 +52,13 @@ router.post("/create-zap", authMiddleware, async (req, res) => {
         return zap.id;
 
     })
+
     return res.json({
-        zapId
+        message: "Zap Created",
+        zapId: zapId
     })
 })
+
 
 router.get("/get-zaps", authMiddleware, async (req, res) => {
     // @ts-ignore

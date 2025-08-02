@@ -59,7 +59,8 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
         return zap.id;
     }));
     return res.json({
-        zapId
+        message: "Zap Created",
+        zapId: zapId
     });
 }));
 router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
