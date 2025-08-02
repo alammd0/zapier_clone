@@ -23,6 +23,7 @@ model Zap {
   trigger   Trigger?
   zapRun    ZapRun[]
   action    Action[]
+  createdAt DateTime @default(now())
 }
 
 model Trigger {

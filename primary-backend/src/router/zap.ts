@@ -67,17 +67,20 @@ router.get("/get-zaps", authMiddleware, async (req, res) => {
         where: {
             userId: id
         },
+
         include: {
             action: {
                include: {
                     type: true
                }
             },
+
             trigger: {
                 include: {
                     type: true
                 }
-            }
+            },
+            
         }
     });
 

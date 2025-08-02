@@ -29,10 +29,12 @@ export type Action = {
 }
 
 export type getZaps = {
+    id : string,
     triggerId : string,
     userId : string,
     trigger : Trigger,
-    actions : ActionData[],
+    action : ActionData[],
+    createdAt : string,
 }
 
 type ActionData = {
@@ -47,5 +49,10 @@ type ActionData = {
 }
 type Trigger = {
     triggerId : string,
+    type : {
+        id : string,
+        name : string,
+        image : string,
+    }
 }
 

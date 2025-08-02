@@ -46,6 +46,8 @@ export default function ZapDrawSection() {
     }[]
   >([]);
 
+  // const [editZap, setEditZap] = useState([]);
+
   async function handleClick() {
      if (!selectTrigger) {
          console.error("No trigger selected");
@@ -60,9 +62,11 @@ export default function ZapDrawSection() {
                  availableMetadata : x.metadata ?? {},
              }))
          });
+
          if(!response){
             toast.error(response.message);
          } 
+
          toast.success(response.message);
          router.push("/dashboard");
      }

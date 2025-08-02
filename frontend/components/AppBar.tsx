@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import PrimaryBtn from "./buttonComponents/PrimaryBtn";
 import SecondaryBtn from "./buttonComponents/SecondaryBtn";
-import {useState } from "react";
+import {useEffect, useState } from "react";
 import { User } from "@/types";
 import { toast } from "sonner";
 
@@ -16,13 +16,19 @@ export default function AppBar() {
   const onSignup = pathname === "/signup";
   const onDashboard = pathname === "/dashboard";
 
-  const token = localStorage.getItem("token");
-  
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = localStorage.getItem("token");
+    setToken(t);
+  }, []);
+
+
   const logout = () => {
     localStorage.removeItem("token");
-    toast.success("Logged out successfully");
-    router.push("/");
-  }
+    setToken(null);
+    router.push("/login");
+  };
 
   return (
     <div className="bg-[#FBFAF8] flex justify-between items-center py-2 px-10 border-b border-r-gray-200 shadow-2xs">

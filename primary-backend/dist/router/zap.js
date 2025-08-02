@@ -80,7 +80,7 @@ router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(voi
                 include: {
                     type: true
                 }
-            }
+            },
         }
     });
     return res.json({
