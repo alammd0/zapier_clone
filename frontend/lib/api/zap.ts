@@ -4,6 +4,7 @@ import { Zap } from "@/types";
 
 
 export const createZap = async (data : Zap) => {
+    console.log("Creating Zap with data:", data);
     const response = await axios.post(`${API_URL}/zap/create-zap`, data , {
         headers : {
             Authorization : `${localStorage.getItem("token")}`

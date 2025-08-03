@@ -34,19 +34,19 @@ export default function ZapDrawSection() {
   }>();
 
   const [actionModal, setActionModal] = useState<null | number>(null);
-
   const router = useRouter();
+
   const [selectAction, setSelectAction] = useState<
     {
       index: number;
       AvailableActionId: string;
       AvailableActionName: string;
       image?: string;
-      metadata?: Record<string, any>;
+      metadata: any;
     }[]
   >([]);
 
-  // const [editZap, setEditZap] = useState([]);
+  console.log("selectAction", selectAction);
 
   async function handleClick() {
      if (!selectTrigger) {
@@ -54,6 +54,8 @@ export default function ZapDrawSection() {
          return;
      }
      try{
+         console.log("selectTrigger", selectTrigger);
+         console.log("selectAction", selectAction);
          const response = await createZap({
              availableTriggerId: selectTrigger.id,
              triggerMetadata: {},
@@ -66,6 +68,8 @@ export default function ZapDrawSection() {
          if(!response){
             toast.error(response.message);
          } 
+
+         console.log("response", response);
 
          toast.success(response.message);
          router.push("/dashboard");
@@ -123,6 +127,7 @@ export default function ZapDrawSection() {
                   index: a.length + 2,
                   AvailableActionId: "",
                   AvailableActionName: "",
+                  metadata: {},
                 },
               ]);
             }}
@@ -152,7 +157,7 @@ export default function ZapDrawSection() {
           setActionModal={setActionModal}
           availableItem={actionModal === 1 ? availableTrigger : availableAction}
           onSelect={(
-            props: { name: string; id: string; image: string } | null
+            props: { name: string; id: string; image: string, metadata: any } | null
           ) => {
             if (props === null) {
               setActionModal(null);
@@ -174,6 +179,7 @@ export default function ZapDrawSection() {
                     AvailableActionId: props.id,
                     AvailableActionName: props.name,
                     image: props.image,
+                    metadata: props.metadata ?? {},
                   };
                 }
                 return newActions;

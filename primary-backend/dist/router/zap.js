@@ -25,9 +25,11 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
     const parsedData = types_1.ZapCreateSchema.safeParse(body);
     if (!parsedData.success) {
         return res.status(411).json({
-            message: "Incorrect inputs"
+            message: "Incorrect inputs",
         });
     }
+    const metaData = parsedData.data.actions;
+    console.log("metaData", metaData.map((x) => x.actionMetadata));
     const zapId = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
         const zap = yield db_1.default.zap.create({
             data: {
@@ -37,30 +39,31 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
                     create: parsedData.data.actions.map((x, index) => ({
                         actionId: x.availableActionId,
                         sortingOrder: index,
-                        metadata: x.actionMetadata
-                    }))
-                }
-            }
+                        metadata: x.actionMetadata,
+                    })),
+                },
+            },
         });
+        // console.log("zap", zap);
         const trigger = yield tx.trigger.create({
             data: {
                 triggerId: parsedData.data.availableTriggerId,
                 zapId: zap.id,
-            }
+            },
         });
         yield tx.zap.update({
             where: {
-                id: zap.id
+                id: zap.id,
             },
             data: {
-                triggerId: trigger.id
-            }
+                triggerId: trigger.id,
+            },
         });
         return zap.id;
     }));
     return res.json({
         message: "Zap Created",
-        zapId: zapId
+        zapId: zapId,
     });
 }));
 router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -68,23 +71,23 @@ router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(voi
     const id = req.id;
     const zaps = yield db_1.default.zap.findMany({
         where: {
-            userId: id
+            userId: id,
         },
         include: {
             action: {
                 include: {
-                    type: true
-                }
+                    type: true,
+                },
             },
             trigger: {
                 include: {
-                    type: true
-                }
+                    type: true,
+                },
             },
-        }
+        },
     });
     return res.json({
-        zaps
+        zaps,
     });
 }));
 router.get("/get-zap/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -94,23 +97,23 @@ router.get("/get-zap/:zapId", middleware_1.authMiddleware, (req, res) => __await
     const zap = yield db_1.default.zap.findFirst({
         where: {
             id: zapId,
-            userId: id
+            userId: id,
         },
         include: {
             action: {
                 include: {
-                    type: true
-                }
+                    type: true,
+                },
             },
             trigger: {
                 include: {
-                    type: true
-                }
-            }
-        }
+                    type: true,
+                },
+            },
+        },
     });
     return res.json({
-        zap
+        zap,
     });
 }));
 exports.zapRouter = router;
