@@ -33,8 +33,6 @@ export default function ActionModal({
 
   const isTrigger = index === 1;
 
-  console.log("")
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-100/90 bg-opacity-80 z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-[420px] max-w-full">
@@ -78,7 +76,7 @@ export default function ActionModal({
                 if (selectedAction) {
                   onSelect({
                     ...selectedAction,
-                    metadata,
+                    metadata: metadata,
                   });
                 }
               }}
@@ -91,7 +89,7 @@ export default function ActionModal({
                 if (selectedAction) {
                   onSelect({
                     ...selectedAction,
-                    metadata,
+                    metadata: metadata,
                   });
                 }
               }}

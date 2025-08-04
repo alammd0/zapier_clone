@@ -28,27 +28,28 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
             message: "Incorrect inputs",
         });
     }
-    const metaData = parsedData.data.actions;
-    console.log("metaData", metaData.map((x) => x.actionMetadata));
     const zapId = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const zap = yield db_1.default.zap.create({
+        const zap = yield tx.zap.create({
             data: {
                 userId: id,
                 triggerId: "",
                 action: {
-                    create: parsedData.data.actions.map((x, index) => ({
-                        actionId: x.availableActionId,
-                        sortingOrder: index,
-                        metadata: x.actionMetadata,
-                    })),
+                    create: parsedData.data.actions.map((x, index) => {
+                        var _a;
+                        return ({
+                            actionId: x.availableActionId,
+                            sortingOrder: index,
+                            metadata: (_a = x.actionMetadata) !== null && _a !== void 0 ? _a : {},
+                        });
+                    }),
                 },
             },
         });
-        // console.log("zap", zap);
         const trigger = yield tx.trigger.create({
             data: {
                 triggerId: parsedData.data.availableTriggerId,
                 zapId: zap.id,
+                metadata: parsedData.data.triggerMetadata,
             },
         });
         yield tx.zap.update({
@@ -114,6 +115,55 @@ router.get("/get-zap/:zapId", middleware_1.authMiddleware, (req, res) => __await
     });
     return res.json({
         zap,
+    });
+}));
+router.post("/update-zap/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //@ts-ignore
+    const id = req.id;
+    const zapId = req.params.zapId;
+    const body = req.body;
+    const parsedData = types_1.ZapCreateSchema.safeParse(body);
+    if (!parsedData.success) {
+        return res.status(411).json({
+            message: "Incorrect inputs",
+        });
+    }
+    const updatedZap = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+        // 1. Delete existing actions
+        yield tx.action.deleteMany({
+            where: {
+                zapId: zapId,
+            },
+        });
+        // 2. Create new actions
+        const newActions = yield Promise.all(parsedData.data.actions.map((x, index) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield tx.action.create({
+                data: {
+                    actionId: x.availableActionId,
+                    sortingOrder: index,
+                    metadata: x.actionMetadata,
+                    zapId: zapId,
+                }
+            });
+        })));
+        // 3. Update trigger
+        const updatedTrigger = yield tx.trigger.update({
+            where: {
+                zapId: zapId,
+            },
+            data: {
+                triggerId: parsedData.data.availableTriggerId,
+                metadata: parsedData.data.triggerMetadata,
+            },
+        });
+        return {
+            actions: newActions,
+            trigger: updatedTrigger,
+        };
+    }));
+    return res.json({
+        message: "Zap Updated",
+        updatedZap,
     });
 }));
 exports.zapRouter = router;

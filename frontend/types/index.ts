@@ -25,7 +25,7 @@ export type Zap = {
 
 export type Action = {
     availableActionId : string,
-    availableMetadata : {},
+    actionMetadata : {},
 }
 
 export type getZaps = {

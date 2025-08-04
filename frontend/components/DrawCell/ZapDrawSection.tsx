@@ -54,14 +54,12 @@ export default function ZapDrawSection() {
          return;
      }
      try{
-         console.log("selectTrigger", selectTrigger);
-         console.log("selectAction", selectAction);
          const response = await createZap({
              availableTriggerId: selectTrigger.id,
              triggerMetadata: {},
              actions: selectAction.map((x) => ({
                  availableActionId :  x.AvailableActionId,
-                 availableMetadata : x.metadata ?? {},
+                 actionMetadata : x.metadata ?? {},
              }))
          });
 

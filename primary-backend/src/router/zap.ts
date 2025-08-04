@@ -17,11 +17,8 @@ router.post("/create-zap", authMiddleware, async (req, res) => {
     });
   }
 
-  const metaData = parsedData.data.actions;
-  console.log("metaData", metaData.map((x) => x.actionMetadata));
-
   const zapId = await prisma.$transaction(async (tx) => {
-    const zap = await prisma.zap.create({
+    const zap = await tx.zap.create({
       data: {
         userId: id,
         triggerId: "",
@@ -29,18 +26,17 @@ router.post("/create-zap", authMiddleware, async (req, res) => {
           create: parsedData.data.actions.map((x, index) => ({
             actionId: x.availableActionId,
             sortingOrder: index,
-            metadata: x.actionMetadata,
+            metadata: x.actionMetadata ?? {},
           })),
         },
       },
     });
 
-    // console.log("zap", zap);
-
     const trigger = await tx.trigger.create({
       data: {
         triggerId: parsedData.data.availableTriggerId,
         zapId: zap.id,
+        metadata: parsedData.data.triggerMetadata,
       },
     });
 
@@ -119,4 +115,61 @@ router.get("/get-zap/:zapId", authMiddleware, async (req, res) => {
   });
 });
 
+router.post("/update-zap/:zapId", authMiddleware, async (req, res) => {
+  //@ts-ignore
+  const id = req.id;
+  const zapId = req.params.zapId;
+  const body = req.body;
+
+  const parsedData = ZapCreateSchema.safeParse(body);
+  if (!parsedData.success) {
+    return res.status(411).json({
+      message: "Incorrect inputs",
+    });
+  }
+
+  const updatedZap = await prisma.$transaction(async (tx) => {
+    // 1. Delete existing actions
+    await tx.action.deleteMany({
+      where: {
+        zapId: zapId,
+      },
+    });
+
+    // 2. Create new actions
+    const newActions = await Promise.all(parsedData.data.actions.map(async (x, index) => {
+      return await tx.action.create({
+        data: {
+          actionId: x.availableActionId,
+          sortingOrder: index,
+          metadata: x.actionMetadata,
+          zapId: zapId,
+        }
+      });
+    }));
+
+    // 3. Update trigger
+    const updatedTrigger = await tx.trigger.update({
+      where: {
+        zapId: zapId,
+      },
+      data: {
+        triggerId: parsedData.data.availableTriggerId,
+        metadata: parsedData.data.triggerMetadata,
+      },
+    });
+
+    return {
+      actions: newActions,
+      trigger: updatedTrigger,
+    };
+  });
+
+  return res.json({
+    message: "Zap Updated",
+    updatedZap,
+  });
+});
+
 export const zapRouter = router;
+
