@@ -1,5 +1,6 @@
 "use client";
 
+import { WEB_HOOK_URL } from "@/config";
 import { formatDate } from "@/lib/formatDate";
 import { getZaps } from "@/types";
 import { useRouter } from "next/navigation";
@@ -52,7 +53,7 @@ export default function ZapHistory({ zaps }: { zaps: getZaps[] }) {
                     ))}
                   </td>
                   <td className="px-4 py-2 border">{formatDate(zap.createdAt)}</td>
-                  <td className="px-4 py-2 border truncate max-w-xs">Webhook URL</td>
+                  <td className="px-4 py-2 border truncate max-w-xs">{`${WEB_HOOK_URL}/hooks/catch/`}</td>
                   <td className="px-4 py-2 border text-center">
                     <BiSolidEditAlt onClick={() => {
                         // Handle edit action

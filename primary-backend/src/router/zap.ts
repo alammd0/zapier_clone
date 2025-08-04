@@ -18,7 +18,7 @@ router.post("/create-zap", authMiddleware, async (req, res) => {
   }
 
   const zapId = await prisma.$transaction(async (tx) => {
-    const zap = await tx.zap.create({
+    const zap = await prisma.zap.create({
       data: {
         userId: id,
         triggerId: "",
@@ -78,6 +78,11 @@ router.get("/get-zaps", authMiddleware, async (req, res) => {
           type: true,
         },
       },
+      user : {
+         select : {
+            id: true,
+         }
+      }
     },
   });
 

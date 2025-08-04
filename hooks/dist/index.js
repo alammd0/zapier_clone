@@ -48,6 +48,6 @@ app.post('/hooks/catch/:user/:zapId', (req, res) => __awaiter(void 0, void 0, vo
     });
     // push it on to a queue
 }));
-app.listen(3000, () => {
-    console.log('listening on port 3000');
+app.listen(3001, () => {
+    console.log('listening on port 3001');
 });

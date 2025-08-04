@@ -8,53 +8,64 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
+  id       Int    @id @default(autoincrement())
   name     String
   email    String
   password String
+  zap      Zap[]
 }
 
 model Zap {
   id        String   @id @default(uuid())
   triggerId String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
   trigger   Trigger?
   zapRun    ZapRun[]
   action    Action[]
+  createdAt DateTime @default(now())
 }
 
 model Trigger {
   id        String            @id @default(uuid())
   zapId     String            @unique
   triggerId String
+  metadata  Json              @default("{}")
   type      AvailableTriggers @relation(fields: [triggerId], references: [id])
   zap       Zap               @relation(fields: [zapId], references: [id])
 }
 
 model Action {
-  id       String          @id @default(uuid())
-  zapId    String
-  zap      Zap             @relation(fields: [zapId], references: [id])
-  actionId String
-  type     AvailableAction @relation(fields: [actionId], references: [id])
+  id           String          @id @default(cuid())
+  zapId        String
+  zap          Zap             @relation(fields: [zapId], references: [id], onDelete: Cascade)
+  actionId     String
+  type         AvailableAction @relation(fields: [actionId], references: [id])
+  sortingOrder Int
+  metadata     Json?           @default("{}")
+
+  @@unique([zapId, sortingOrder])
 }
 
 model AvailableAction {
   id      String   @id @default(uuid())
   name    String
+  image   String
   actions Action[]
 }
 
 model AvailableTriggers {
   id       String    @id @default(uuid())
   name     String
+  image    String
   triggers Trigger[]
 }
 
 model ZapRun {
-  id           String         @id @default(uuid())
+  id           String        @id @default(uuid())
   zapId        String
-  metaData     Json
-  zap          Zap            @relation(fields: [zapId], references: [id])
+  metaData     Json          @default("{}")
+  zap          Zap           @relation(fields: [zapId], references: [id])
   zapRunOutbox ZapRunOutBox?
 }
 

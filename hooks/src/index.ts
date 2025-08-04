@@ -44,6 +44,6 @@ app.post('/hooks/catch/:user/:zapId', async (req, res) => {
     // push it on to a queue
 })
 
-app.listen(3000, () => {
-  console.log('listening on port 3000');
+app.listen(3001, () => {
+  console.log('listening on port 3001');
 });

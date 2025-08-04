@@ -25,7 +25,9 @@ export default function ZapHeading() {
         }
 
         fetchZapData();
-    }, [])
+    }, []);
+
+    console.log("Zaps", zaps);
 
 
 
