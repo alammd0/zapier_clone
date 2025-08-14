@@ -53,7 +53,7 @@ export default function ZapHistory({ zaps }: { zaps: getZaps[] }) {
                     ))}
                   </td>
                   <td className="px-4 py-2 border">{formatDate(zap.createdAt)}</td>
-                  <td className="px-4 py-2 border truncate max-w-xs">{`${WEB_HOOK_URL}/hooks/catch/`}</td>
+                  <td className="px-4 py-2 border truncate max-w-xs cursor-pointer">{`${WEB_HOOK_URL}/hooks/catch/${zap.userId}/${zap.id}`}</td>
                   <td className="px-4 py-2 border text-center">
                     <BiSolidEditAlt onClick={() => {
                         // Handle edit action

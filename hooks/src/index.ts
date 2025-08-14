@@ -14,10 +14,7 @@ app.post('/hooks/catch/:user/:zapId', async (req, res) => {
 
     // store in db a new trigger for this user
     // create transition for this user 
-    console.log("Rich Hook Called");
     await prisma.$transaction(async (tsx) => {
-        // create a new zapRun
-        console.log("Creating a new ZapRun");
         const run = await tsx.zapRun.create({
             data: {
                 zapId : zapId,
@@ -25,23 +22,17 @@ app.post('/hooks/catch/:user/:zapId', async (req, res) => {
             },
         });
 
-        console.log("Creating a new ZapRunOutBox")
-
         await tsx.zapRunOutBox.create({
             data: {
                 zapRunId: run.id,
             },
         });
-
-        // create a new trigger
-        console.log("Creating a new Trigger");
     });
 
     res.json({
         status: 'success',
         message : "Successfully created a new ZapRun",
     })
-    // push it on to a queue
 })
 
 app.listen(3001, () => {

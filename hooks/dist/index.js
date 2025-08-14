@@ -23,30 +23,23 @@ app.post('/hooks/catch/:user/:zapId', (req, res) => __awaiter(void 0, void 0, vo
     const body = req.body;
     // store in db a new trigger for this user
     // create transition for this user 
-    console.log("Rich Hook Called");
     yield prisma.$transaction((tsx) => __awaiter(void 0, void 0, void 0, function* () {
-        // create a new zapRun
-        console.log("Creating a new ZapRun");
         const run = yield tsx.zapRun.create({
             data: {
                 zapId: zapId,
                 metaData: body,
             },
         });
-        console.log("Creating a new ZapRunOutBox");
         yield tsx.zapRunOutBox.create({
             data: {
                 zapRunId: run.id,
             },
         });
-        // create a new trigger
-        console.log("Creating a new Trigger");
     }));
     res.json({
         status: 'success',
         message: "Successfully created a new ZapRun",
     });
-    // push it on to a queue
 }));
 app.listen(3001, () => {
     console.log('listening on port 3001');

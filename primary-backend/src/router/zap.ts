@@ -177,4 +177,3 @@ router.post("/update-zap/:zapId", authMiddleware, async (req, res) => {
 });
 
 export const zapRouter = router;
-

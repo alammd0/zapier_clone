@@ -190,7 +190,7 @@ function SolanaSender({
 }) {
   const [solanaData, setSolanaData] = useState({
     address: "",
-    amount: 0,
+    amount: "",
   });
 
   console.log("solanaData", solanaData);
@@ -219,15 +219,14 @@ function SolanaSender({
           Amount:
         </label>
         <input
-          type="number"
+          type="text"
           className="border-1 border-gray-200 rounded-lg p-2 hover:outline-blue-600 hover:border-blue-600"
           value={solanaData.amount}
           placeholder="Amount"
           id="amount"
-          min={0}
           step="0.01"
           onChange={(e) =>
-            setSolanaData({ ...solanaData, amount: parseFloat(e.target.value) })
+            setSolanaData({ ...solanaData, amount: e.target.value })
           }
         />
       </div>

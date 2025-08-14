@@ -30,7 +30,7 @@ function main() {
                 topic: TOPIC_NAME,
                 messages: pendingRows.map((row) => {
                     return {
-                        value: row.zapRunId,
+                        value: JSON.stringify({ zapRunId: row.zapRunId, stage: 0 })
                     };
                 }),
             });
@@ -41,6 +41,7 @@ function main() {
                     },
                 },
             });
+            yield new Promise(r => setTimeout(r, 3000));
         }
     });
 }

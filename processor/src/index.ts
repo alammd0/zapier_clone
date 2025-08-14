@@ -10,7 +10,6 @@ const kafka  = new Kafka({
 });
 
 async function main() {
-
     const processor = kafka.producer();
     await processor.connect();
 
@@ -24,7 +23,7 @@ async function main() {
         topic: TOPIC_NAME,
         messages: pendingRows.map((row) => {
             return {
-                value: row.zapRunId,
+                 value: JSON.stringify({ zapRunId: row.zapRunId, stage: 0 })
             };
         }),
     })
@@ -36,6 +35,8 @@ async function main() {
             },
         },
     })
+
+    await new Promise(r => setTimeout(r, 3000));
   }
 }
 
