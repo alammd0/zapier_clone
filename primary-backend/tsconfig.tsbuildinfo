@@ -1,1 +1,1 @@
-{"root":["./prisma/seed.ts","./src/db.ts","./src/index.ts","./src/middleware.ts","./src/router/trigure.ts","./src/router/action.ts","./src/router/user.ts","./src/router/zap.ts","./src/types/index.ts"],"errors":true,"version":"5.8.3"}
+{"root":["./src/db.ts","./src/index.ts","./src/middleware.ts","./src/sentemail.ts","./src/router/trigure.ts","./src/router/action.ts","./src/router/user.ts","./src/router/zap.ts","./src/types/index.ts"],"version":"5.9.2"}

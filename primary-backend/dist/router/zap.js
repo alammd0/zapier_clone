@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,7 +9,7 @@ const middleware_1 = require("../middleware");
 const types_1 = require("../types");
 const db_1 = __importDefault(require("../db"));
 const router = (0, express_1.Router)();
-router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/create-zap", middleware_1.authMiddleware, async (req, res) => {
     // @ts-ignore
     const id = req.id;
     const body = req.body;
@@ -28,31 +19,28 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
             message: "Incorrect inputs",
         });
     }
-    const zapId = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
-        const zap = yield tx.zap.create({
+    const zapId = await db_1.default.$transaction(async (tx) => {
+        const zap = await db_1.default.zap.create({
             data: {
                 userId: id,
                 triggerId: "",
                 action: {
-                    create: parsedData.data.actions.map((x, index) => {
-                        var _a;
-                        return ({
-                            actionId: x.availableActionId,
-                            sortingOrder: index,
-                            metadata: (_a = x.actionMetadata) !== null && _a !== void 0 ? _a : {},
-                        });
-                    }),
+                    create: parsedData.data.actions.map((x, index) => ({
+                        actionId: x.availableActionId,
+                        sortingOrder: index,
+                        metadata: x.actionMetadata ?? {},
+                    })),
                 },
             },
         });
-        const trigger = yield tx.trigger.create({
+        const trigger = await tx.trigger.create({
             data: {
                 triggerId: parsedData.data.availableTriggerId,
                 zapId: zap.id,
                 metadata: parsedData.data.triggerMetadata,
             },
         });
-        yield tx.zap.update({
+        await tx.zap.update({
             where: {
                 id: zap.id,
             },
@@ -61,16 +49,16 @@ router.post("/create-zap", middleware_1.authMiddleware, (req, res) => __awaiter(
             },
         });
         return zap.id;
-    }));
+    });
     return res.json({
         message: "Zap Created",
         zapId: zapId,
     });
-}));
-router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/get-zaps", middleware_1.authMiddleware, async (req, res) => {
     // @ts-ignore
     const id = req.id;
-    const zaps = yield db_1.default.zap.findMany({
+    const zaps = await db_1.default.zap.findMany({
         where: {
             userId: id,
         },
@@ -85,17 +73,22 @@ router.get("/get-zaps", middleware_1.authMiddleware, (req, res) => __awaiter(voi
                     type: true,
                 },
             },
+            user: {
+                select: {
+                    id: true,
+                }
+            }
         },
     });
     return res.json({
         zaps,
     });
-}));
-router.get("/get-zap/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/get-zap/:zapId", middleware_1.authMiddleware, async (req, res) => {
     //@ts-ignore
     const id = req.id;
     const zapId = req.params.zapId;
-    const zap = yield db_1.default.zap.findFirst({
+    const zap = await db_1.default.zap.findFirst({
         where: {
             id: zapId,
             userId: id,
@@ -116,8 +109,8 @@ router.get("/get-zap/:zapId", middleware_1.authMiddleware, (req, res) => __await
     return res.json({
         zap,
     });
-}));
-router.post("/update-zap/:zapId", middleware_1.authMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/update-zap/:zapId", middleware_1.authMiddleware, async (req, res) => {
     //@ts-ignore
     const id = req.id;
     const zapId = req.params.zapId;
@@ -128,16 +121,16 @@ router.post("/update-zap/:zapId", middleware_1.authMiddleware, (req, res) => __a
             message: "Incorrect inputs",
         });
     }
-    const updatedZap = yield db_1.default.$transaction((tx) => __awaiter(void 0, void 0, void 0, function* () {
+    const updatedZap = await db_1.default.$transaction(async (tx) => {
         // 1. Delete existing actions
-        yield tx.action.deleteMany({
+        await tx.action.deleteMany({
             where: {
                 zapId: zapId,
             },
         });
         // 2. Create new actions
-        const newActions = yield Promise.all(parsedData.data.actions.map((x, index) => __awaiter(void 0, void 0, void 0, function* () {
-            return yield tx.action.create({
+        const newActions = await Promise.all(parsedData.data.actions.map(async (x, index) => {
+            return await tx.action.create({
                 data: {
                     actionId: x.availableActionId,
                     sortingOrder: index,
@@ -145,9 +138,9 @@ router.post("/update-zap/:zapId", middleware_1.authMiddleware, (req, res) => __a
                     zapId: zapId,
                 }
             });
-        })));
+        }));
         // 3. Update trigger
-        const updatedTrigger = yield tx.trigger.update({
+        const updatedTrigger = await tx.trigger.update({
             where: {
                 zapId: zapId,
             },
@@ -160,10 +153,10 @@ router.post("/update-zap/:zapId", middleware_1.authMiddleware, (req, res) => __a
             actions: newActions,
             trigger: updatedTrigger,
         };
-    }));
+    });
     return res.json({
         message: "Zap Updated",
         updatedZap,
     });
-}));
+});
 exports.zapRouter = router;

@@ -1,8 +1,11 @@
 import { Kafka } from "kafkajs";
 import { PrismaClient } from "@prisma/client";
+import { parse } from "./parser";
+import { JsonObject } from "@prisma/client/runtime/library";
+import { sendEmail } from "./email";
+import { sendSol } from "./sendSol";
 
 const prism = new PrismaClient();
-
 
 const TOPIC_NAME = "zap-event";
 
@@ -25,11 +28,10 @@ async function main() {
       console.log({
         partition,
         offset : message.offset,
-        value : message.value.toString(),
+        value : message?.value?.toString(),
       });
 
-      const parseValue = JSON.parse(message.value.toString());
-      console.log("Parse Value - ", parseValue);
+      const parseValue = JSON.parse(message?.value?.toString() || "{}");
       const zapRunId = parseValue.zapRunId;
       const stage = parseValue.stage;
 
@@ -50,9 +52,6 @@ async function main() {
         }
       }); 
       
-      console.log("Zap Run Details - ", zapRunDetails);
-
-
       const currentAction = zapRunDetails?.zap.action.find((x) => x.sortingOrder === stage);
 
       if(!currentAction){
@@ -65,19 +64,23 @@ async function main() {
       const zapRunMetaData = zapRunDetails?.metaData;
 
       if(currentAction.type.name === "Email"){
-        console.log("Email Send Request");
+          const body = parse((currentAction.metadata as JsonObject)?.body as string, zapRunMetaData);
+          const to = parse((currentAction.metadata as JsonObject)?.email as string, zapRunMetaData);
+          console.log(`Sending email to ${to} with body ${body}`);
+          await sendEmail(to, body);
       }
 
       if(currentAction.type.name === "Solana"){
-        console.log("Solana Request");
+         const amount = parse((currentAction.metadata as JsonObject)?.amount as string, zapRunMetaData);
+         const address = parse((currentAction.metadata as JsonObject)?.address as string, zapRunMetaData);
+         console.log(`Sending ${amount} SOL to ${address}`);
+         await sendSol(address, amount);
       }
 
       await new Promise(r => setTimeout(r, 3000));
 
       const lastStage = (zapRunDetails?.zap.action.length || 1) - 1;
       console.log("Last Stage - ", lastStage);
-
-      console.log(lastStage === stage);
 
       if(lastStage !== stage){
         console.log("Pushing in Queue");
@@ -93,7 +96,6 @@ async function main() {
       }
 
       console.log("Processing Done"); 
-
       await consumer.commitOffsets([{
         topic: TOPIC_NAME,
         partition,

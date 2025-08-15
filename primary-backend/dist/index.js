@@ -12,7 +12,6 @@ const action_1 = require("./router/action");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
-console.log("Check pass - 00");
 app.use("/api/v1/user", user_1.userRouter);
 app.use("/api/v1/zap", zap_1.zapRouter);
 app.use("/api/v1/zap", Trigure_1.TriggerRouter);
