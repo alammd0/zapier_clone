@@ -76,7 +76,8 @@ The application is built using a microservices architecture, with distinct servi
     ```bash
     cd primary-backend && npx prisma migrate dev --name init && cd ..
     cd hooks && npx prisma migrate dev --name init && cd ..
-    # Add commands for other services with prisma if needed
+    cd processor && npx prisma migrate dev --name init && cd ..
+    cd worker && npx prisma migrate dev --name init && cd ..
     ```
 
 ### Running the Application

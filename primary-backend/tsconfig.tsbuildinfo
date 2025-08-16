@@ -1,1 +1,1 @@
-{"root":["./src/db.ts","./src/index.ts","./src/middleware.ts","./src/sentemail.ts","./src/router/trigure.ts","./src/router/action.ts","./src/router/user.ts","./src/router/zap.ts","./src/types/index.ts"],"version":"5.9.2"}
+{"root":["./src/otp.ts","./src/db.ts","./src/index.ts","./src/middleware.ts","./src/sentemail.ts","./src/router/trigure.ts","./src/router/action.ts","./src/router/user.ts","./src/router/zap.ts","./src/types/index.ts"],"version":"5.9.2"}

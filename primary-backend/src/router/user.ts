@@ -6,7 +6,7 @@ import prisma from "../db";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../sentEmail";
-import { error } from "console";
+import { generateOTP } from "../OTP";
 
 const router = Router();
 
@@ -27,33 +27,48 @@ router.post("/signup", async  (req, res) => {
             const { name, email, password } = parsedUser.data ; 
             
             // check user exist or not
-            const useExist = await prisma.user.findFirst({
+            const userExist = await prisma.user.findFirst({
                 where: {
                     email: email,
                 },
             }) ; 
     
-            if(useExist){
+            if(userExist){
                 res.status(403).json({
                     message: "User Already Exist",
 
                 });
             }
-    
+
+            
             //  hashed password
-            const hashedPassword = await bcrypt.hash(password, 10);
-    
-            const newUser = await prisma.user.create({
-                data: {
-                    name: name,
-                    email: email,
-                    password: hashedPassword,
-                },
+            const hashedPassword = await bcrypt.hash(password, 10); 
+
+            const newUser =  await prisma.user.create({
+                data : {
+                    name : name,
+                    email : email,
+                    password : hashedPassword,
+                    isVerified : false
+                }
+            })
+
+            const OTP = generateOTP(); 
+            await sendEmail(email, "Welcome to Zapier", `Your OTP is ${OTP}`);
+
+            console.log("Reached here - I")
+
+            await prisma.otp.create({
+                data : {
+                    userId : newUser.id,
+                    otp : String(OTP)
+                }
             });
 
+            console.log("Reached here - II")
+
             response = res.status(201).json({
-                message: "User Created",
-                data: newUser,
+                message : "OTP Send, Please very the User..."  
             });
         };
 
@@ -65,6 +80,64 @@ router.post("/signup", async  (req, res) => {
             error: e,
         });
 }});
+
+router.post("/verify-otp", async (req, res) => {
+    try{
+        console.log("Hit here");
+        console.log("req.body", req.body);
+        const { otp } = req.body;
+        console.log("otp", otp);
+
+        if(!otp){
+            return res.status(400).json({
+                message : "OTP is required",
+            })
+        };
+
+        const OtpData = await prisma.otp.findFirst({
+            where : {
+                otp : otp
+            }
+        });
+
+        console.log("Hit here - I");
+
+        if(!OtpData){
+            return res.status(404).json({
+                message : "OTP not found",
+            })
+        };
+
+        await prisma.user.update({
+            where : {
+                id : OtpData.userId
+            },
+            data : {
+                isVerified : true
+            }
+        });
+
+        console.log("Hit here - II");
+
+        // delete otp
+        await prisma.otp.delete({
+            where : {
+                id : OtpData.id
+            }
+        });
+
+        return res.status(200).json({
+            message : "User Created"
+        })
+
+    }
+    catch(e){
+        return res.status(502).json({
+            message : "Server Error",
+            error : e
+        })
+    }
+})
 
 router.post("/login", async (req, res) => {
     try{
@@ -193,7 +266,7 @@ router.post("/send-email", async (req, res) => {
 
         const token  = jwt.sign(options, process.env.JWT_SECRET as string);
 
-        const link = `${process.env.FRONTEND_URL}/forgot-password?token=${token}`;
+        const link = `${process.env.FRONTEND_URL}/update-password?token=${token}`;
 
         const html = `<h1>Welcome to Zapier</h1><p>Please click the link below to reset your password</p><a href="${link}">Reset Password</a>`;
 
@@ -291,7 +364,5 @@ router.put("/update-password", async (req, res) => {
         })
     }
 });
-
-// Add feature like if new user register then first very with OTP then Go to login Page and if OTP is correct then login
 
 export const userRouter = router;

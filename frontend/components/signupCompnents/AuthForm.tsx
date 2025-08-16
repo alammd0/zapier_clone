@@ -4,6 +4,7 @@ import { Login, SignUp } from "@/lib/api/auth";
 import { HtmlHTMLAttributes, useState } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AuthForm({ type }: { type: string }) {
 
@@ -32,7 +33,7 @@ export default function AuthForm({ type }: { type: string }) {
         }
 
         toast.success(response.message)
-        router.push("/login");
+        router.push("/verify-otp")
       }
       else{
         const { email, password } = userData;
@@ -110,6 +111,16 @@ export default function AuthForm({ type }: { type: string }) {
                 value={userData.password}
               />
             </div>
+
+            {
+              type === "login" && (
+                <div className="flex justify-end text-[#f39970] text-sm hover:text-[#f39970]/80 cursor-pointer">
+                  <Link href="/forgot-password">
+                    Forgot Password?
+                  </Link>
+                </div>
+              )
+            }
 
             <button
               className="bg-[#FF4F00] text-white rounded-lg p-2 hover:bg-[#FF4F00]/90 transition-all duration-200 cursor-pointer"
