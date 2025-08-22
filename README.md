@@ -1,6 +1,6 @@
-# Zapier Clone
+# Zapier with Gmail and Solana
 
-This project is a full-stack clone of Zapier, an online automation tool that connects your favorite apps, such as Gmail, Slack, and more. This implementation allows users to create automated workflows ("Zaps") consisting of a trigger and a series of actions.
+This project is a Zapier clone where I built the Gmail and Solana collaboration; the remaining parts are the same. This implementation allows users to create automated workflows ("Zaps") consisting of a trigger and a series of actions.
 
 ## Architecture
 
